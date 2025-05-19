@@ -21,8 +21,7 @@ A launch configuration is provided, named
 that you can run in order to serve the content of the Eclipse website project's contents via `localhost`.
 It will open a page in your default browser where the first link is to the root of the Eclipse website.
 This allows you to preview all the changes that you make to the website locally **before** you commit them.
-Sometimes it's necessary to do a deep refresh,
-e.g., `Ctrl-F5`.
+Sometimes it's necessary to do a deep refresh, e.g., `Ctrl-F5`.
 
 #### Pages
 
@@ -66,23 +65,17 @@ An image can say more than a thousand words:
 ### News Item Title and Description
 
 The whole entry should be a blurb pitched to the Eclipse end-user community,
-not just to members of the Eclipse Platform development team
+not just to members of the Eclipse Platform development team.
 
-The title should be short and snappy,
-written in title case.
+The title should be short and snappy, written in title case.
 The title should not use trailing punctuation.
-As markdown,
-the title defines the anchor,
+As markdown, the title defines the anchor,
 which is generally the lowercase equivalent with all non-alphanumberic characters replaced by `-`.
-Please test your links.
+Please test your links!
 
-In the news description,
-tell users about changes they'll see in the UI.
+In the news description, tell users about changes they'll see in the UI.
 Tell component writers about changes they'll see at the client- and server-side APIs.
-Try to generate some excitement,
-save the boring details for the manual,
-be short,
-and don't repeat yourself.
+Try to generate some excitement, save the boring details for the manual, be short, and don't repeat yourself.
 The description should be complete sentences, with trailing punctuation.
 
 Make the entry self-contained and mention API classes.
