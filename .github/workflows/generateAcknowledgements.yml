@@ -1,0 +1,62 @@
+name: Generate Acknowledgements
+on:
+  workflow_dispatch:
+    inputs:
+      eclipse-version:
+        description: The version of the Eclipse-TLPs to be released. Something like '4.36'
+        required: true
+        type: string
+      simRel-version:
+        description: The version of the Eclipse-SimRel to be released. Something like '2025-06'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        repository: eclipse-platform/eclipse.platform.releng.aggregator
+        ref: master
+        fetch-depth: 0 # Check-out all history
+        submodules: true
+    - name: Collect contributor emails
+      run: |
+        echo "Hello world"
+        # Collect from all submodules and the releng-aggr and sort them per orga
+        # git log "R4_35...master" --pretty=format:"%an"
+        # Collect all commits that went into the current release
+        # only consider the autor and coauthorsalso-by?
+        # Use https://docs.github.com/en/rest/commits/commits?apiVersion=2022-11-28#compare-two-commits?
+        # https://github.com/orgs/community/discussions/30313 or https://github.com/github/docs/blob/main/content/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors.md
+        # Replace the markers in the current ack-file for each orga
+    - name: Create Acknowledgements for Release ${{ github.event.milestone.title }}
+      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+      with:
+        script: |
+          github.rest.repos.get({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          })
+          # See https://github.com/actions/github-script?tab=readme-ov-file#welcome-a-first-time-contributor
+          const allCommits = octokit.rest.dependencyGraph.diffRange({
+            owner,
+            repo,
+            basehead: ${{ inputs.eclipse-version }}...master
+          });
+          # TODO: consider pagination
+          # OR octokit.rest.repos.compareCommitsWithBasehead ? at https://octokit.github.io/rest.js/v21/#repos
+    - name: Create Acknowledgements for Release ${{ github.event.milestone.title }}
+      uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+      with:
+        commit-message: Acknowledgements for ${{ inputs.eclipse-version }}
+        branch: acknowledgements_${{ inputs.eclipse-version }}
+        title: Acknowledgements for ${{ inputs.eclipse-version }}
+        delete-branch: true

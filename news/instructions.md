@@ -145,4 +145,4 @@ Use regular markdown for the image so it can be appropriately rendered and style
 To create the directory and all the related content for a new release,
 use the [4.x-template directory](4.x-template).
 Replace `4.x` in the markdown files with the Eclipse project's release version
-and replace `YYYY-MM` with the corresponding SimRel release name.
+and replace `20YY-MM` with the corresponding SimRel release name.
