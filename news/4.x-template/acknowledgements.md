@@ -1,4 +1,4 @@
-## Eclipse 20YY-MM Acknowledgements
+## Eclipse YYYY-MM Acknowledgements
 
 Last revised <!-- Insert date: February 25, 2025-->
 
@@ -23,16 +23,20 @@ We also thank the other Eclipse projects that make up part of the infrastructure
 
 The Platform team would like to thank everyone who has helped us improve quality by testing and reporting bugs and enhancement requests.
 Special thanks to all code contributors (alphabetically):
-<!-- Insert eclipse-platform contributor list -->
+<!-- START: eclipse-platform contributor list -->
+<!-- END:   eclipse-platform contributor list -->
 
 The JDT team thanks everyone who filed good enhancement requests, helped improve quality by testing and filing bug reports, and provided answers on JDT forums/newsgroups.
 Special thanks to all code contributors (alphabetically):
-<!-- Insert eclipse-jdt contributor list -->
+<!-- START: eclipse-jdt contributor list -->
+<!-- END:   eclipse-jdt contributor list -->
 
 The Plug-in Development Environment team thanks numerous contributors who continue to improve the component every release.
 Special thanks to all code contributors (alphabetically):
-<!-- Insert eclipse-pde contributor list -->
+<!-- START: eclipse-pde contributor list -->
+<!-- END:   eclipse-pde contributor list -->
 
 The Equinox team thanks all contributors who helped improve the project by filing bug reports and enhancement requests.
 Special thanks to all code contributors (alphabetically): 
-<!-- Insert eclipse-equinox contributor list -->
+<!-- START: eclipse-equinox contributor list -->
+<!-- END:   eclipse-equinox contributor list -->
