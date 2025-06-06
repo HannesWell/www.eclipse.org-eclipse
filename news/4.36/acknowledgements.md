@@ -6,7 +6,7 @@ We would also like to thank the users and adopters who support our efforts throu
 
 A special thanks goes to [Holger Voormann](https://github.com/howlger/) for his Eclipse IDE promotion videos.
 
-A special thanks to other Eclipse projects we build upon: EMF and ECF, who also provide timely updates so we can release on time.
+Another special thanks to other Eclipse projects we build upon: EMF and ECF, who also provide timely updates so we can release on time.
 We also thank the other Eclipse projects that make up part of the infrastructure we depend on: Tycho, Orbit, EGit, EMF, and ECF for providing fixes and steady improvements.
 
 ## Eclipse Platform
@@ -37,7 +37,7 @@ Special thanks to all code contributors (alphabetically):
 <!-- START: eclipse-equinox contributors -->
 <!-- END:   eclipse-equinox contributors -->
 
-## Eclipse-Foundation
+## Eclipse Foundation
 
 The entire Eclipse Project team would like to thank the [Eclipse Foundation staff](https://www.eclipse.org/org/foundation/staff/) for their tireless efforts and especially
 Frederic Gurr and Sébastien Heurtematte for not only keeping all that infrastructure going but also constantly improving it;

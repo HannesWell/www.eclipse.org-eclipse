@@ -536,6 +536,7 @@ const newAndNoteworthySubjects = {
 	pde: {
 		label: 'New features for Plug-in developers'
 	},
+	//TODO: only show this for 4.36 or later!
 	acknowledgements: {
 		label: 'Contributor acknowledgements'
 	}
@@ -810,7 +811,10 @@ function generateProjectAcknowledgements() {
 
 		const main = document.getElementById('midcolumn');
 		main.replaceChildren(...toElements(`
-<h2><span class="fa fa-address-book-o"> Acknowlegements</span></h2>
+<h2><span class="fa fa-address-book-o"> Acknowledgements</span></h2>
+<p>
+  Acknowledgements of later releases are directly published in the <a href="../news">News</a> section.
+</p>
 <ul>
 	${items.join('\n')}
 </ul>
