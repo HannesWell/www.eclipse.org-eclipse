@@ -65,12 +65,7 @@ jobs:
           const orgaContributors = new Map()
           for (const repo of allRepos) {
             let [organization, repository] = repo.split('/')
-            let contributorName2profileURL = orgaContributors.get(organization)
-            if (!contributorName2profileURL) {
-              contributorName2profileURL = new Map()
-              orgaContributors.set(organization, contributorName2profileURL)
-            }
-            
+            let contributorName2profileURL = computeIfAbsent(orgaContributors, organization, () => new Map())
             console.log("Query for organization '" + organization + "' repository '" + repository + "'" )
             // See https://octokit.github.io/rest.js/v21/#repos-compare-commits-with-basehead
             // About pagination, see https://github.com/octokit/octokit.js#pagination
@@ -125,9 +120,23 @@ jobs:
             day: "numeric",
           })
           fs.writeFileSync(acknowledgementsFile, lines.join('\n'), {encoding: 'utf8'})
-          // TODO: check for duplicates based on their GH profile URL?! Use their GH profile name then?
+          
+          function computeIfAbsent(map, key, valueSupplier) {
+            let value = map.get(key)
+            if (!value) {
+              value = valueSupplier()
+              map.set(key, value)
+            }
+            return value
+          }
+          // TODO: check for duplicates based on their GH profile URL/or mail?! Use their GH profile name then?
             // or collect all names and use the longest one?
+          // Collect all names from git for one mail/GH-profile (GH-profile should be preferred as it's possible to link many mails to one profile).
+          // Consider names in git and the profile's name and select the longest one and prefer GH? Or just use the GH name? (akurtakov case)
+          // Also collect all GH-committers and use that GH-profile if the name is equal to the selected one. Then prefer the committer profile (jukzi case)
           //TODO: check the current output, sometimes the author seems wrong?
+          // Filter bot's (e.g. eclipse bots based on their name i.e. profile id matches pattern:  eclipse-\w+-bot
+            //  Dependabot? By name? dependabot. dependabot profile link is wrong!
           // TODO: consider coauthors/also-by?
     - name: Create Acknowledgements for Release ${{ github.event.milestone.title }}
       uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
