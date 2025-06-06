@@ -110,11 +110,13 @@ jobs:
               throw new Error('Start or end marker to found for organization: ' + organization)
             }
             let contributorEntries = []
-            for (const [contributorName, contributorProfile] of contributors) {
+            // Sort by name in ascending order
+            const sortedContributors = Array.from(contributors).sort((e1, e2) => e1[0].localeCompare(e2[0]));
+            for (const [contributorName, contributorProfile] of sortedContributors) {
               console.log(contributorName + ' = ' + contributorProfile)
               contributorEntries.push('- [' + contributorName + '](' + contributorProfile + ')')
             }
-            lines.splice(startMarker + 1,endMarker - (startMarker + 1), ...contributorEntries)
+            lines.splice(startMarker + 1, endMarker - (startMarker + 1), ...contributorEntries)
           }
           const lastRevisedLineIndex = lines.findIndex(lin => lin.startsWith('Last revised: '));
           lines[lastRevisedLineIndex] = 'Last revised: ' + new Date().toLocaleDateString("en-US", {

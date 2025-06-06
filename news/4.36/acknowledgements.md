@@ -2,18 +2,6 @@
 
 Last revised: <!-- Insert date: February 25, 2025-->
 
-The entire Eclipse Project team would like to thank the Eclipse Foundation staff for their tireless efforts, including:
-Denis Roy,
-Matt Ward,
-Eric Poirier,
-Pawel Stankiewicz,
-Frederic Gurr
-and Sébastien Heurtematte
-for not only keeping all that infrastructure going but also constantly improving it;
-Sharon Corbett for guiding us through the Eclipse legal process;
-Wayne Beaton for giving us process support and improved tools to simplify and manage our development process;
-and Mike Milinkovich for running the whole show.
-
 We would also like to thank the users and adopters who support our efforts through a range of activities, including early testing, being a Friend of Eclipse, contracting special work, or outright employment.
 
 A special thanks goes to [Holger Voormann](https://github.com/howlger/) for his Eclipse IDE promotion videos.
@@ -48,3 +36,8 @@ The Equinox team thanks all contributors who helped improve the project by filin
 Special thanks to all code contributors (alphabetically): 
 <!-- START: eclipse-equinox contributors -->
 <!-- END:   eclipse-equinox contributors -->
+
+## Eclipse-Foundation
+
+The entire Eclipse Project team would like to thank the [Eclipse Foundation staff](https://www.eclipse.org/org/foundation/staff/) for their tireless efforts and especially
+Frederic Gurr and Sébastien Heurtematte for not only keeping all that infrastructure going but also constantly improving it;
