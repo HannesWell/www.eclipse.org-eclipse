@@ -63,6 +63,8 @@ jobs:
           console.log("Query all commits from tag '" + lastReleaseTag + "' up to master")
           
           const orgaContributors = new Map()
+          const authorNames = new Map()
+          const committerNames = new Map()
           for (const repo of allRepos) {
             let [organization, repository] = repo.split('/')
             let contributorName2profileURL = computeIfAbsent(orgaContributors, organization, () => new Map())
@@ -78,6 +80,7 @@ jobs:
             let commitCount = 0
             for await (const response of responseIterator) { // iterate through each response
               for (const commitData of response.data.commits) {
+                console.log(commitData)
                 let authorName = commitData.commit.author.name
                 let authorGHProfileURL = commitData.author?.html_url
                 // console.log(commitData)
