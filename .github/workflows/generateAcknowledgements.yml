@@ -69,7 +69,7 @@ jobs:
           const orgaContributors = new Map()
           const contributorNames = new Map()
           const profileReplacements = new Set()
-          const skippedBotAccounts = new Map()
+          const skippedBotAccounts = new Set()
           for (const repo of allRepos) {
             let [organization, repository] = repo.split('/')
             let contributors = computeIfAbsent(orgaContributors, organization, () => new Set())
@@ -87,15 +87,17 @@ jobs:
                 console.log(commitData)
                 let authorName = commitData.commit.author.name
                 if (commitData.author) {
-                  let profile = commitData.author.html_url
+                  let profile = commitData.author.login
                   if (isBotEmail(commitData.commit.author.email)) { // Exclude contributors from bot-accounts
-                    skippedBotAccounts.set(profile, authorName)
+                    skippedBotAccounts.add(profile)
                     continue;
                   }
-                  if (commitData.commit.author.name == commitData.commit.committer.name && commitData.committer) {
+                  const committerProfile = commitData.committer?.login
+                  if (commitData.commit.author.name == commitData.commit.committer.name 
+                        && committerProfile && profile != committerProfile) {
                     // Sometimes contributors use different profiles. Let the committer profile take precedence
-                    profile = commitData.committer.html_url
-                    profileReplacements.add([ commitData.author.html_url, profile ])
+                    profileReplacements.add(profile + "->" + committerProfile)
+                    profile = committerProfile
                   }
                   contributors.add(profile)
                   computeIfAbsent(contributorNames, profile, () => new Set()).add(authorName)
@@ -113,14 +115,11 @@ jobs:
           // ------------------------------------------------------
           const selectedContributorNames = new Map()
           for (const [profile, names] of contributorNames) {
-            let selectedName = null
-            if (names.size == 1) {
-              selectedName = names.keys().next().value
-            } else {
-              console.log("Multiple names encountered for " + profile + ": " + names)
-              //TODO: implement logic! TODO: consider profile name?
-              selectedName = names.keys().next().value
+            if (names.size > 1) {
+              console.log("Multiple names encountered for " + profile + ": " + Array.from(names).join(', '))
             }
+            // Select longest name, assuming that's correct
+            let selectedName = [...names].reduce((n1, n2) => n1.length > n2.length ? n1 : n2)
             selectedContributorNames.set(profile, selectedName)
           }
           const orgaContributorEntries = new Map()
@@ -175,9 +174,9 @@ jobs:
           })
           fs.writeFileSync(acknowledgementsFile, lines.join('\n'), {encoding: 'utf8'})
           
-          //TODO: add this to the PR message as well as ommitted bot accounts?!
-          console.log("Profile replacements: " + profileReplacements)
-          console.log("Skipped bots: " + skippedBotAccounts)
+          //TODO: add this to the PR message as well as omitted bot accounts?!
+          console.log("Profile replacements: " + Array.from(profileReplacements).join(', '))
+          console.log("Skipped bots: " + Array.from(skippedBotAccounts).join(', '))
           
           function isBotEmail(email) {
             return email.endsWith("-bot@eclipse.org") || email.endsWith("[bot]@users.noreply.github.com")
@@ -192,13 +191,6 @@ jobs:
             return value
           }
           
-          // TODO: check for duplicates based on their GH profile URL/or mail?! Use their GH profile name then?
-            // or collect all names and use the longest one?
-          // Collect all names from git for one mail/GH-profile (GH-profile should be preferred as it's possible to link many mails to one profile).
-          // Consider names in git and the profile's name and select the longest one and prefer GH? Or just use the GH name? (akurtakov case)
-          // Also collect all GH-committers and use that GH-profile if the name is equal to the selected one. Then prefer the committer profile (jukzi case)
-          //TODO: check the current output, sometimes the author seems wrong?
-            // TODO: Dependabot? By name? dependabot. dependabot profile link is wrong!
           // TODO: consider coauthors/also-by?
     - name: Create Acknowledgements for Release ${{ github.event.milestone.title }}
       uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
