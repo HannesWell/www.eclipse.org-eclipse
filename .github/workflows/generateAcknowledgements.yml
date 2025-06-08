@@ -38,7 +38,9 @@ jobs:
       uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
       with:
         script: |
+          // ----------------------------------------------
           // Collect all repositories
+          // ----------------------------------------------
           const submoduleURLs = '${{ steps.collect-repos.outputs.repos }}'.trim()
           console.log("Repo list is: " + submoduleURLs)
           const ghBaseURL = 'https://github.com/'
@@ -60,20 +62,22 @@ jobs:
           let [major, minor] = '${{ inputs.eclipse-version }}'.split('.')
           let previousMinor = parseInt(minor) - 1
           let lastReleaseTag = 'R' + major + '_' + previousMinor
+          // ----------------------------------------------
+          // Collect the contributors for each organization
+          // ----------------------------------------------
           console.log("Query all commits from tag '" + lastReleaseTag + "' up to master")
-          
           const orgaContributors = new Map()
-          const authorNames = new Map()
-          const committerNames = new Map()
+          const contributorNames = new Map()
+          const profileReplacements = new Set()
+          const skippedBotAccounts = new Map()
           for (const repo of allRepos) {
             let [organization, repository] = repo.split('/')
-            let contributorName2profileURL = computeIfAbsent(orgaContributors, organization, () => new Map())
+            let contributors = computeIfAbsent(orgaContributors, organization, () => new Set())
             console.log("Query for organization '" + organization + "' repository '" + repository + "'" )
             // See https://octokit.github.io/rest.js/v21/#repos-compare-commits-with-basehead
             // About pagination, see https://github.com/octokit/octokit.js#pagination
             let responseIterator = github.paginate.iterator(github.rest.repos.compareCommitsWithBasehead, {
-              owner: organization,
-              repo: repository,
+              owner: organization, repo: repository,
               basehead: lastReleaseTag + '...master',
               per_page: 200,
             })
@@ -82,11 +86,20 @@ jobs:
               for (const commitData of response.data.commits) {
                 console.log(commitData)
                 let authorName = commitData.commit.author.name
-                let authorGHProfileURL = commitData.author?.html_url
-                // console.log(commitData)
-                if (commitData.author) { // author is null for directly pushed commits, which happens e.g. for I-build submodule updates
-                  contributorName2profileURL.set(authorName, authorGHProfileURL)
-                } else {
+                if (commitData.author) {
+                  let profile = commitData.author.html_url
+                  if (isBotEmail(commitData.commit.author.email)) { // Exclude contributors from bot-accounts
+                    skippedBotAccounts.set(profile, authorName)
+                    continue;
+                  }
+                  if (commitData.commit.author.name == commitData.commit.committer.name && commitData.committer) {
+                    // Sometimes contributors use different profiles. Let the committer profile take precedence
+                    profile = commitData.committer.html_url
+                    profileReplacements.add([ commitData.author.html_url, profile ])
+                  }
+                  contributors.add(profile)
+                  computeIfAbsent(contributorNames, profile, () => new Set()).add(authorName)
+                } else { // author is null for directly pushed commits, which happens e.g. for I-build submodule updates
                   console.log('Skip commit of ' + authorName)
                 }
                 commitCount++
@@ -95,11 +108,40 @@ jobs:
             console.log('Processed commits: ' + commitCount)
           }
           
-          // Insert the list of contributors into the template file for each organization
-          const acknowledgementsFile = 'website/news/${{ inputs.eclipse-version }}/acknowledgements.md'
+          // ------------------------------------------------------
+          // Select name if multiple have been found for one contributor
+          // ------------------------------------------------------
+          const selectedContributorNames = new Map()
+          for (const [profile, names] of contributorNames) {
+            let selectedName = null
+            if (names.size == 1) {
+              selectedName = names.keys().next().value
+            } else {
+              console.log("Multiple names encountered for " + profile + ": " + names)
+              //TODO: implement logic! TODO: consider profile name?
+              selectedName = names.keys().next().value
+            }
+            selectedContributorNames.set(profile, selectedName)
+          }
+          const orgaContributorEntries = new Map()
+          for (const [organization, contributors] of orgaContributors) {
+            const contributorEntries = []
+            for (const contributorProfile of contributors) {
+              const name = selectedContributorNames.get(contributorProfile)
+              if (!name) {
+                 throw new Error('No selected name for profile: ' + contributorProfile)
+              }
+              contributorEntries.push([name, contributorProfile])
+            }
+            contributorEntries.sort((e1, e2) => e1[0].localeCompare(e2[0]))
+          }
+          
+          // ------------------------------------------------------
+          // Insert the list of contributors into the template file
+          // ------------------------------------------------------
           const fs = require('fs')
+          const acknowledgementsFile = 'website/news/${{ inputs.eclipse-version }}/acknowledgements.md'
           let lines = fs.readFileSync(acknowledgementsFile, {encoding: 'utf8'}).split(/\r?\n/)
-          const orgaContributorsLists = new Map()
           for (const [organization, contributors] of orgaContributors) {
             console.log('Insert contributors of ' + organization)
             const startMarker = lines.indexOf('<!-- START: ' + organization + ' contributors -->')
@@ -107,22 +149,39 @@ jobs:
             if (startMarker < 0 || endMarker < 0) {
               throw new Error('Start or end marker to found for organization: ' + organization)
             }
-            let contributorEntries = []
-            // Sort by name in ascending order
-            const sortedContributors = Array.from(contributors).sort((e1, e2) => e1[0].localeCompare(e2[0]));
-            for (const [contributorName, contributorProfile] of sortedContributors) {
-              console.log(contributorName + ' = ' + contributorProfile)
-              contributorEntries.push('- [' + contributorName + '](' + contributorProfile + ')')
+            const contributorEntries = []
+            for (const contributorProfile of contributors) {
+              const name = selectedContributorNames.get(contributorProfile)
+              if (!name) {
+                 throw new Error('No selected name for profile: ' + contributorProfile)
+              }
+              contributorEntries.push([name, contributorProfile])
             }
-            lines.splice(startMarker + 1, endMarker - (startMarker + 1), ...contributorEntries)
+            // Sort by name in ascending order
+            contributorEntries.sort((e1, e2) => e1[0].localeCompare(e2[0]))
+            
+            let contributorLines = []
+            for (const [contributorName, contributorProfile] of contributorEntries) {
+              contributorLines.push('- [' + contributorName + '](' + contributorProfile + ')')
+            }
+            lines.splice(startMarker + 1, endMarker - (startMarker + 1), ...contributorLines)
           }
-          const lastRevisedLineIndex = lines.findIndex(l => l.startsWith('Last revised: '));
+          // Update last-revised date
+          const lastRevisedLineIndex = lines.findIndex(l => l.startsWith('Last revised: '))
           lines[lastRevisedLineIndex] = 'Last revised: ' + new Date().toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric",
           })
           fs.writeFileSync(acknowledgementsFile, lines.join('\n'), {encoding: 'utf8'})
+          
+          //TODO: add this to the PR message as well as ommitted bot accounts?!
+          console.log("Profile replacements: " + profileReplacements)
+          console.log("Skipped bots: " + skippedBotAccounts)
+          
+          function isBotEmail(email) {
+            return email.endsWith("-bot@eclipse.org") || email.endsWith("[bot]@users.noreply.github.com")
+          }
           
           function computeIfAbsent(map, key, valueSupplier) {
             let value = map.get(key)
@@ -132,14 +191,14 @@ jobs:
             }
             return value
           }
+          
           // TODO: check for duplicates based on their GH profile URL/or mail?! Use their GH profile name then?
             // or collect all names and use the longest one?
           // Collect all names from git for one mail/GH-profile (GH-profile should be preferred as it's possible to link many mails to one profile).
           // Consider names in git and the profile's name and select the longest one and prefer GH? Or just use the GH name? (akurtakov case)
           // Also collect all GH-committers and use that GH-profile if the name is equal to the selected one. Then prefer the committer profile (jukzi case)
           //TODO: check the current output, sometimes the author seems wrong?
-          // Filter bot's (e.g. eclipse bots based on their name i.e. profile id matches pattern:  eclipse-\w+-bot
-            //  Dependabot? By name? dependabot. dependabot profile link is wrong!
+            // TODO: Dependabot? By name? dependabot. dependabot profile link is wrong!
           // TODO: consider coauthors/also-by?
     - name: Create Acknowledgements for Release ${{ github.event.milestone.title }}
       uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
