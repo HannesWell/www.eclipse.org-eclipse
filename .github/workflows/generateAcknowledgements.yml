@@ -124,14 +124,13 @@ jobs:
           }
           const orgaContributorEntries = new Map()
           for (const [organization, contributors] of orgaContributors) {
-            const contributorEntries = []
-            for (const contributorProfile of contributors) {
-              const name = selectedContributorNames.get(contributorProfile)
+            const contributorEntries = Array.from(contributors, profile => {
+              const name = selectedContributorNames.get(profile)
               if (!name) {
-                 throw new Error('No selected name for profile: ' + contributorProfile)
+                 throw new Error('No selected name for profile: ' + profile)
               }
-              contributorEntries.push([name, contributorProfile])
-            }
+              return [name, profile]
+            })
             contributorEntries.sort((e1, e2) => e1[0].localeCompare(e2[0]))
           }
           
@@ -159,11 +158,9 @@ jobs:
             // Sort by name in ascending order
             contributorEntries.sort((e1, e2) => e1[0].localeCompare(e2[0]))
             
-            let contributorLines = []
-            for (const [contributorName, contributorProfile] of contributorEntries) {
-              contributorLines.push('- [' + contributorName + '](' + contributorProfile + ')')
-            }
-            lines.splice(startMarker + 1, endMarker - (startMarker + 1), ...contributorLines)
+            lines.splice(startMarker + 1, endMarker - (startMarker + 1), ...Array.from(contributorEntries, ([name, profileId]) => {
+              return '- [' + name + '](' + ghBaseURL + profileId + ')'
+            }))
           }
           // Update last-revised date
           const lastRevisedLineIndex = lines.findIndex(l => l.startsWith('Last revised: '))
