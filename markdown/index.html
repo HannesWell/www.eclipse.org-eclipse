@@ -40,7 +40,6 @@
 			padding: 0;
 			margin: 0;
 			margin-left: 0.5em;
-
 		}
 
 		.tl1 {
@@ -130,21 +129,30 @@
 			transition: .2s;
 		}
 
+		p .avatar,
 		summary .avatar {
 			width: 2em;
 		}
 
+		td .avatar,
 		li .avatar {
 			width: 3.5em;
 		}
 
+		p .avatar:hover,
 		summary .avatar:hover {
 			transform: scale(3);
 		}
 
+		td .avatar:hover,
 		li .avatar:hover,
 		.avatar-hover {
 			transform: scale(2);
+		}
+
+		/* intended for table, tr, th, td */
+		.contributor-list {
+			border: none;
 		}
 
 		/*]]>*/
@@ -289,8 +297,6 @@
 			return `<a href="${profileHref}"><img class="avatar" src="${profileHref}.png"/></a>`;
 		}
 
-		//TODO: inject Avatar in acknoledgements too
-
 		function generateContributorSection(a, logicalHref) {
 			const li = a.parentElement;
 			if (li.localName == 'li') {
@@ -326,6 +332,35 @@
 									}
 								}, 10);
 							};
+						}
+					}
+				}
+			}
+		}
+		
+		function generateProfileAvatars(a, logicalHref) {
+			const parent = a.parentElement;
+			const avatar = toElements(`<span>${generateAvatar(logicalHref)}&nbsp;</span>`)[0];
+			parent.insertBefore(avatar, a);
+			a.onmouseenter = () => {
+				avatar.querySelector('img').classList.add('avatar-hover')
+			};
+			a.onmouseleave = () => {
+				avatar.querySelector('img').classList.remove('avatar-hover')
+			};
+			// We only need to process the overall contributor table once.
+			if (parent.localName == 'td' && !parent.classList.contains('contributor-list')) {
+				const tr = parent.parentElement;
+				if (tr?.localName == 'tr') {
+					const tbody = tr.parentElement;
+					if (tbody?.localName == 'tbody') {
+						const table = tbody.parentElement;
+						if (table?.localName == 'table') {
+							table.classList.add('contributor-list')
+							const tableElements = table.querySelectorAll('th, tr, td');
+							for (const e of tableElements) {
+								e.classList.add('contributor-list')
+							}
 						}
 					}
 				}
@@ -376,6 +411,7 @@ ${headings.map(({id, raw, level}) => `<li class="tl${level}"><a href="#${id}">${
 				}
 
 				const as = targetElement.querySelectorAll("a[href]");
+				const isAcknowledgements = logicalBaseURL.pathname.endsWith("acknowledgements.md")
 				for (const a of as) {
 					const href = a.getAttribute('href');
 					if (href == null) {
@@ -390,7 +426,11 @@ ${headings.map(({id, raw, level}) => `<li class="tl${level}"><a href="#${id}">${
 					const logicalHref = new URL(href, logicalBaseURL);
 					if (!logicalHref.pathname.endsWith('.md')) {
 						if (/^https:\/\/github.com\/[^\/]+$/.exec(logicalHref.toString())) {
-							generateContributorSection(a, logicalHref);
+							if (isAcknowledgements) {
+								generateProfileAvatars(a, logicalHref);
+							} else {
+								generateContributorSection(a, logicalHref);
+							}
 						} else {
 							const siteURL = toSiteURL(logicalHref);
 							if (siteURL != null) {

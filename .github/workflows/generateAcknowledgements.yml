@@ -39,9 +39,16 @@ jobs:
       id: collect-contributors
       with:
         script: |
+          const maxContributorsPerRow = 3
           let [major, minor] = '${{ inputs.eclipse-version }}'.split('.')
-          let previousMinor = parseInt(minor) - 1
-          let lastReleaseTag = 'R' + major + '_' + previousMinor
+          const previousMinor = parseInt(minor) - 1
+          const previousReleaseTag = 'R' + major + '_' + previousMinor
+          let currentReleaseTag = 'master'
+          if (await isTagAvailable('R' + major + '_' + minor)) {
+            currentReleaseTag = 'R' + major + '_' + minor
+          } else if (await isTagAvailable('S' + major + '_' + minor + '_0_RC2')) {
+            currentReleaseTag = 'S' + major + '_' + minor + '_0_RC2'
+          }
           
           // ----------------------------------------------
           // Collect all repositories
@@ -67,7 +74,7 @@ jobs:
           // ----------------------------------------------
           // Collect the contributors for each organization
           // ----------------------------------------------
-          console.log("Query all commits from tag '" + lastReleaseTag + "' up to master")
+          console.log("Query all commits from tag '" + previousReleaseTag + "' up to '" + currentReleaseTag + "'")
           const orgaContributors = new Map()
           const contributorNames = new Map()
           const profileReplacements = new Set()
@@ -80,7 +87,7 @@ jobs:
             // About pagination, see https://github.com/octokit/octokit.js#pagination
             let responseIterator = github.paginate.iterator(github.rest.repos.compareCommitsWithBasehead, {
               owner: organization, repo: repository,
-              basehead: lastReleaseTag + '...master',
+              basehead: previousReleaseTag + '...' + currentReleaseTag,
               per_page: 200,
             })
             let commitCount = 0
@@ -90,7 +97,7 @@ jobs:
                 let authorName = commitData.commit.author.name
                 if (commitData.author) {
                   let profile = commitData.author.login
-                  if (isBotEmail(commitData.commit.author.email)) { // Exclude contributors from bot-accounts
+                  if (isBot(commitData.commit.author)) { // Exclude contributors from bot-accounts
                     skippedBotAccounts.add(profile)
                     continue;
                   }
@@ -100,6 +107,10 @@ jobs:
                     // Sometimes contributors use different profiles. Let the committer profile take precedence
                     profileReplacements.add(profile + " -> " + committerProfile)
                     profile = committerProfile
+                  }
+                  if (profile == 'eclipse-releng-bot' || profile == 'eclipsewebmaster') {
+                    //TODO: remove
+                    console.log(commitData)
                   }
                   contributors.add(profile)
                   computeIfAbsent(contributorNames, profile, () => new Set()).add(authorName)
@@ -133,6 +144,7 @@ jobs:
           const fs = require('fs')
           const acknowledgementsFile = 'website/news/${{ inputs.eclipse-version }}/acknowledgements.md'
           let lines = fs.readFileSync(acknowledgementsFile, {encoding: 'utf8'}).split(/\r?\n/)
+          let elementsInLine = 0
           for (const [organization, contributors] of orgaContributors) {
             console.log('Insert contributors of ' + organization)
             const startMarker = lines.indexOf('<!-- START: ' + organization + ' contributors -->')
@@ -149,9 +161,21 @@ jobs:
             })
             // Sort by name in ascending order
             contributorEntries.sort((e1, e2) => e1[0].localeCompare(e2[0]))
-            const contributorLines = Array.from(contributorEntries, ([name, profileId]) => {
-              return '- [' + name + '](' + ghBaseURL + profileId + ')'
-            })
+            
+            const contributorLines = ['|'.repeat(maxContributorsPerRow) + '|', '|---'.repeat(maxContributorsPerRow) + '|']
+            let line = ''
+            let elements = 0
+            for (const [name, profileId] of contributorEntries) {
+              line += ('| [' + name + '](' + ghBaseURL + profileId + ') ')
+              if (++elements >= maxContributorsPerRow) {
+                contributorLines.push(line + '|')
+                line = ''
+                elements = 0
+              }
+            }
+            if (line.length !== 0) {
+              contributorLines.push(line + ' |')
+            }
             lines.splice(startMarker + 1, endMarker - (startMarker + 1), ...contributorLines)
           }
           // Update last-revised date
@@ -169,10 +193,21 @@ jobs:
           core.setOutput('skipped-bots', Array.from(skippedBotAccounts).map(b => "  - @" + b).join("\n"));
           core.setOutput('name-inconsistencies', nameInconsistencies.map(l => "  - " + l).join("\n"));
           
-          // TODO: consider coauthors/also-by?
+          function isTagAvailable(tagName) {
+            return github.rest.git.getRef({
+              owner: 'eclipse-platform', repo: 'eclipse.platform.releng.aggregator',
+              ref: 'tags/' + tagName,
+            }).then(value => {
+              console.log("Tag found: " + tagName)
+              return value.data.object.type == 'tag';
+            }, error => {
+              console.log("Tag not found: " + tagName)
+              return false;
+            });
+          }
           
-          function isBotEmail(email) {
-            return email.endsWith("-bot@eclipse.org") || email.endsWith("[bot]@users.noreply.github.com")
+          function isBot(author) {
+            return author.email.endsWith("-bot@eclipse.org") || author.email.endsWith("[bot]@users.noreply.github.com") || author.name == 'eclipse-releng-bot'
           }
           
           function computeIfAbsent(map, key, valueSupplier) {
@@ -200,7 +235,7 @@ jobs:
           ${{ steps.collect-contributors.outputs.profile-replacements && steps.collect-contributors.outputs.profile-replacements || 'None' }}
           - Profiles with inconsistent git author names:
           _To avoid this in the future, please ensure you use the same author names across all your local git repositories (e.g. by setting `git config --global user.name "Your Name"`) and across devices!
-          If the selected name, simply the longest one, (marked in bold) is incorrect, please let us know._
+          If the selected name, simply the longest one (and marked in bold), is incorrect, please let us know._
           ${{ steps.collect-contributors.outputs.name-inconsistencies && steps.collect-contributors.outputs.name-inconsistencies || 'None' }}
           - Excluded bot-accounts:
           ${{ steps.collect-contributors.outputs.skipped-bots && steps.collect-contributors.outputs.skipped-bots || 'None' }}
