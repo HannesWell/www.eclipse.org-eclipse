@@ -96,7 +96,7 @@ function redirect(href) {
 		new URL(`${selfHostedMarkdownBase}${window.location.pathname.replace(/^\/eclipse\//, '').replace(/\/$/, '/index.html').replace(/\.html$/, '.md')}`);
 	const body = document.querySelector('body')
 	replaceChildren(body, "body", ...toElements(`<div style="display: none">If you are not redirected automatically, 	follow this <a href='${location}'>link</a>.</div>`));
-	window.location = location;
+	window.location.replace(location);
 }
 
 function generate() {
@@ -113,7 +113,7 @@ function generate() {
 		for (const element of generators) {
 			const generator = element.getAttribute('data-generate');
 			const generate = new Function(generator);
-			generate.call(element, element);
+			generate.call(element, element); //TODO: is second arg necessary?!!
 		}
 
 		const generatedBody = generateBody();
