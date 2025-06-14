@@ -9,7 +9,7 @@ const scriptBase = new URL(".", document.currentScript.src).href
 const apiGitHub = 'https://api.github.com/repos/eclipse-platform/www.eclipse.org-eclipse/contents/';
 const markdownBase = `${scriptBase}markdown/?file=`;
 const selfHostedMarkdownBase = `${scriptBase}markdown/?f=`;
-const newsBase = `${scriptBase}news/news.html?file=`;
+const newsBase = `${scriptBase}news?file=`;
 
 let meta = toElements(`
 <meta charset="utf-8">
