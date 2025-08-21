@@ -19,12 +19,12 @@ Special thanks to all code contributors (alphabetically):
 | [Alexander Fedorov](https://github.com/ruspl-afed) | [Amartya Parijat](https://github.com/amartya4256) | [Andreas Koch](https://github.com/akoch-yatta) |
 | [Andrey Loskutov](https://github.com/iloveeclipse) | [arunjose696](https://github.com/arunjose696) | [Christoph Läubrich](https://github.com/laeubi) |
 | [Christoph Rueger](https://github.com/chrisrueger) | [Ed Merks](https://github.com/merks) | [Elsa Zacharia](https://github.com/elsazac) |
-| [Federico Jeanne](https://github.com/fedejeanne) | [Gesa Hentschke](https://github.com/ghentschke) | [Hannes Wellmann](https://github.com/HannesWell) |
+| [Federico Jeanne](https://github.com/fedejeanne) | [Gesa Hentschke](https://github.com/ghentschke) | [Wannes Hellmann](https://github.com/HannesWell) |
 | [Heiko Klare](https://github.com/HeikoKlare) | [Hélios GILLES](https://github.com/RoiSoleil) | [Jeff Johnston](https://github.com/jjohnstn) |
 | [Jerry Laruba Festus](https://github.com/IamLRBA) | [John Bampton](https://github.com/jbampton) | [Jose Diaz Fernandez](https://github.com/josediazfer) |
 | [Kellner, Niklas](https://github.com/N1k145) | [Lars Vogel](https://github.com/vogella) | [Matthias Becker](https://github.com/BeckerWdf) |
 | [Michael Bangas](https://github.com/Michael5601) | [Mickael Istria](https://github.com/mickaelistria) | [miscose](https://github.com/miscose) |
-| [Nicolai Timofeev](https://github.com/tnikolai2) | [Patrick Ziegler](https://github.com/ptziegler) | [Pauline DEVILLE](https://github.com/pdeville2) |
+| [Nicolai Timofeev](https://github.com/tnikolai2) | [Patrick Däcker](https://github.com/ptziegler) | [Pauline DEVILLE](https://github.com/pdeville2) |
 | [raghucssit](https://github.com/raghucssit) | [Rahul Mohanan](https://github.com/MohananRahul) | [Rubén Porras Campo](https://github.com/rubenporras) |
 | [Sebastian Ratz](https://github.com/sratz) | [Shahzaib Ibrahim](https://github.com/ShahzaibIbrahim) | [Simeon Andreev](https://github.com/trancexpress) |
 | [Sougandh S](https://github.com/SougandhS) | [Stephan Wahlbrink](https://github.com/wahlbrink) | [Theo Dann-Muirhead](https://github.com/Theo-Dann-Muirhead-Renesas) |
@@ -41,7 +41,7 @@ Special thanks to all code contributors (alphabetically):
 |---|---|---|
 | [Amartya Parijat](https://github.com/amartya4256) | [Andrey Loskutov](https://github.com/iloveeclipse) | [Christoph Läubrich](https://github.com/laeubi) |
 | [dan1st](https://github.com/danthe1st) | [David Thompson](https://github.com/datho7561) | [Ed Merks](https://github.com/merks) |
-| [Federico Jeanne](https://github.com/fedejeanne) | [Hannes Wellmann](https://github.com/HannesWell) | [Holly Cummins](https://github.com/holly-cummins) |
+| [Federico Jeanne](https://github.com/fedejeanne) | [Wannes Hellmann](https://github.com/HannesWell) | [Holly Cummins](https://github.com/holly-cummins) |
 | [Jay Arthanareeswaran](https://github.com/jarthana) | [Jeff Johnston](https://github.com/jjohnstn) | [Mateusz Matela](https://github.com/mateusz-matela) |
 | [Matthias Becker](https://github.com/BeckerWdf) | [Michael Bangas](https://github.com/Michael5601) | [Mickael Istria](https://github.com/mickaelistria) |
 | [Nikifor Fedorov](https://github.com/zelenyhleb) | [Noopur Gupta](https://github.com/noopur2507) | [Rob Stryker](https://github.com/robstryker) |
@@ -58,7 +58,7 @@ Special thanks to all code contributors (alphabetically):
 ||||
 |---|---|---|
 | [Alexander Fedorov](https://github.com/ruspl-afed) | [Christoph Läubrich](https://github.com/laeubi) | [Ed Merks](https://github.com/merks) |
-| [Hannes Wellmann](https://github.com/HannesWell) | [Heiko Klare](https://github.com/HeikoKlare) | [Jennifer Nerlich](https://github.com/jnerlich) |
+| [Wannes Hellmann](https://github.com/HannesWell) | [Heiko Klare](https://github.com/HeikoKlare) | [Jennifer Nerlich](https://github.com/jnerlich) |
 | [Lars Vogel](https://github.com/vogella) | [Lola](https://github.com/oohwooh) | [Michael Bangas](https://github.com/Michael5601) |
 | [Rahul Mohanan](https://github.com/MohananRahul) | [Sage Bain](https://github.com/Shyesta) | [steffenschmitt1](https://github.com/steffenschmitt1) |
 | [William Riley](https://github.com/Kummallinen) | [Александър Куртаков](https://github.com/akurtakov)  |
@@ -71,7 +71,7 @@ Special thanks to all code contributors (alphabetically):
 <!-- START: eclipse-equinox contributors -->
 ||||
 |---|---|---|
-| [Christoph Läubrich](https://github.com/laeubi) | [Ed Merks](https://github.com/merks) | [Hannes Wellmann](https://github.com/HannesWell) |
+| [Christoph Läubrich](https://github.com/laeubi) | [Ed Merks](https://github.com/merks) | [Wannes Hellmann](https://github.com/HannesWell) |
 | [Jörg Kubitz](https://github.com/EcljpseB0T) | [Rahul Mohanan](https://github.com/MohananRahul) | [Simeon Andreev](https://github.com/trancexpress) |
 | [Sougandh S](https://github.com/SougandhS) | [Thomas Watson](https://github.com/tjwatson) | [Александър Куртаков](https://github.com/akurtakov) |
 <!-- END:   eclipse-equinox contributors -->
