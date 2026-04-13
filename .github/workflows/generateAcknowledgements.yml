@@ -124,7 +124,7 @@ jobs:
                   if (commitData.commit.author.name == commitData.commit.committer.name
                         && committerProfile && profile != committerProfile) {
                     // Sometimes contributors use different profiles. Let the committer profile take precedence
-                    profileReplacements.add("@" + profile + " -> @" + committerProfile)
+                    profileReplacements.add("" + profile + " -> " + committerProfile)
                     profile = committerProfile
                   }
                   contributors.add(profile)
@@ -168,7 +168,7 @@ jobs:
             } else if (names.size > 1) {
               selectedName = [...names].reduce((n1, n2) => n1.length > n2.length ? n1 : n2)
               console.log("Multiple names encountered for " + profile + ": " + Array.from(names).join(', '))
-              nameInconsistencies.push("@" + profile + ": " + Array.from(names).map(n => n==selectedName ? ("**`" + n + "`**") : ("`" + n + "`")).join(', '))
+              nameInconsistencies.push("" + profile + ": " + Array.from(names).map(n => n==selectedName ? ("**`" + n + "`**") : ("`" + n + "`")).join(', '))
             }
             selectedContributorNames.set(profile, selectedName)
           }
