@@ -126,7 +126,7 @@ jobs:
                   if (authorName == commitData.commit.committer.name
                         && committerProfile && profile != committerProfile) {
                     // Sometimes contributors use different profiles. Let the committer profile take precedence
-                    profileReplacements.add("@" + profile + " -> @" + committerProfile)
+                    profileReplacements.add("" + profile + " -> " + committerProfile)
                     profile = committerProfile
                   }
                   contributors.add(profile)
@@ -164,13 +164,13 @@ jobs:
             // Select longest name, assuming that's correct
             let selectedName = [...names][0]
             const existingName = existingContributorNames.get(profile)
-            if (existingName && (selectedName != existingName || names.size > 1)) {
+            if (existingName && (selectedName != existingName || names.size > 1) && false) {
               selectedName = existingName
               console.log("Reuse existing name '" + existingName + "' for " + profile + ", instead of encountered: " + Array.from(names).join(', '))
             } else if (names.size > 1) {
               selectedName = [...names].reduce((n1, n2) => n1.length > n2.length ? n1 : n2)
               console.log("Multiple names encountered for " + profile + ": " + Array.from(names).join(', '))
-              nameInconsistencies.push("@" + profile + ": " + Array.from(names).map(n => n==selectedName ? ("**`" + n + "`**") : ("`" + n + "`")).join(', '))
+              nameInconsistencies.push("" + profile + ": " + Array.from(names).map(n => n==selectedName ? ("**`" + n + "`**") : ("`" + n + "`")).join(', '))
             }
             selectedContributorNames.set(profile, selectedName)
           }
@@ -212,6 +212,7 @@ jobs:
             }
             lines.splice(startMarker + 1, endMarker - (startMarker + 1), ...contributorLines)
           }
+          lines.push('<!-- A dummy change -->')
           fs.writeFileSync(acknowledgementsFile, lines.join('\n'), {encoding: 'utf8'})
           
           // Set adjustments as outputs in order to append them to the PR message
@@ -226,6 +227,7 @@ jobs:
           > If the selected name, simply the longest one (and marked in bold), is incorrect, please let us know._
           `
           }
+          computeIfAbsent(missingAuthors, 'Neha Burnwal', () => new Set()).add('https://github.com/eclipse-pde/eclipse.pde/commit/4808f7104ad3974b4d06cbc0f6df3dd8de23f9fe')
           if (missingAuthors.size > 0) {
             contributorAdjustments += `
           > [!WARNING]
