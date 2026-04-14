@@ -115,10 +115,15 @@ jobs:
                 }
                 let authorName = commitData.commit.author.name
                 let profile = commitData.author?.login
+                if ( profile == 'eclipse-releng-bot') {
+                  console.log('eclipse-releng-bot commit')
+                  console.log(JSON.stringify(commitData))
+                }
                 if (isBot(commitData.commit.author)) { // Exclude contributions from bot-accounts
                   if(profile) {
                     skippedBotAccounts.add(profile)
                   }
+                  console.log('Continued')
                   continue
                 }
                 if (profile) {
@@ -134,6 +139,11 @@ jobs:
                 } else { // author is null for directly pushed commits, which happens e.g. for I-build submodule updates
                   console.log("Skip commit of " + authorName)
                   computeIfAbsent(missingAuthors, authorName, () => new Set()).add(commitData.html_url)
+                }
+                if ( profile == 'eclipse-releng-bot') {
+                  console.log('Not Continued???')
+                  console.log('eclipse-releng-bot commit')
+                  console.log(JSON.stringify(commitData))
                 }
                 commitCount++
               }
