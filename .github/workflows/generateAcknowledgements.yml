@@ -131,7 +131,7 @@ jobs:
                   computeIfAbsent(contributorNames, profile, () => new Set()).add(authorName)
                 } else { // author is null for directly pushed commits, which happens e.g. for I-build submodule updates
                   console.log("Skip commit of " + authorName)
-                  computeIfAbsent(missingAuthors, authorName, () => new Set()).add(repo)
+                  computeIfAbsent(missingAuthors, authorName, () => new Set()).add(commitData.html_url)
                 }
                 commitCount++
               }
@@ -227,8 +227,10 @@ jobs:
           if (missingAuthors.size > 0) {
             contributorAdjustments += `
           > [!WARNING]
-          > Authors skipped due to missing author metadata on GitHub (probably because the commit author email isn't connected to a GitHub user):
-          ${Array.from(missingAuthors.keys()).map(a => '> - \`' + a + '\` contributed to ' +  Array.from(missingAuthors.get(a)).map(r => '\`' + r + '\`').join(',') ).join('\n')}
+          > Authors skipped due to missing author metadata on GitHub:
+          ${Array.from(missingAuthors.keys()).map(a => '> - \`' + a + '\` contributed\n' +  Array.from(missingAuthors.get(a)).map(c => '>   - ' + c).join('\n') ).join('\n')}
+          >
+          > Probably commit author's email isn't connected to their GitHub user accounts.
           `
           }
           if (profileReplacements.size > 0) {
